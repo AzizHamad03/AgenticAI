@@ -9,11 +9,11 @@ from .hr_serializers import (
 )
 
 __all__ = [
-    "DepartmentSerializer",
-    "JobPositionSerializer",
     "CandidateSerializer",
-    "ResumeSerializer",
-    "ScreeningResultSerializer",
+    "DepartmentSerializer",
     "InterviewQuestionSetSerializer",
+    "JobPositionSerializer",
+    "ResumeSerializer",
     "RunActionSerializer",
+    "ScreeningResultSerializer",
 ]

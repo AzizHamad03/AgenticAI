@@ -145,3 +145,8 @@ OPENAI_DEFAULT_ERROR_MESSAGE = config(
     "OPENAI_DEFAULT_ERROR_MESSAGE",
     default="I'm sorry, I'm having trouble connecting right now. Please try again in a moment.",
 )
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
