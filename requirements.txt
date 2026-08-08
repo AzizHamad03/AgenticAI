@@ -1,0 +1,10 @@
+Django==4.2.16
+djangorestframework==3.15.2
+python-decouple==3.8
+crewai==0.108.0
+crewai-tools==0.38.1
+openai==1.70.0
+psycopg2-binary==2.9.10
+pdfplumber==0.11.4
+python-docx==1.1.2
+requests
