@@ -2,71 +2,46 @@ import json
 import os
 
 import django
-from docx import Document
-from pypdf import PdfReader
 
 
 def setup_django():
     """
-    Initialize Django before importing project modules that may depend
-    on Django settings or models.
+    Initialize Django before importing project modules
+    that depend on Django.
     """
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+
+    os.environ.setdefault(
+        "DJANGO_SETTINGS_MODULE",
+        "config.settings",
+    )
+
     django.setup()
 
 
-def extract_resume_text(file_path: str) -> str:
-    """
-    Extract resume text from PDF, DOCX, or TXT files.
-    """
-    extension = os.path.splitext(file_path)[1].lower()
-
-    if extension == ".pdf":
-        reader = PdfReader(file_path)
-
-        pages_text = []
-
-        for page in reader.pages:
-            page_text = page.extract_text()
-
-            if page_text:
-                pages_text.append(page_text)
-
-        return "\n".join(pages_text)
-
-    if extension == ".docx":
-        document = Document(file_path)
-
-        return "\n".join(
-            paragraph.text
-            for paragraph in document.paragraphs
-            if paragraph.text.strip()
-        )
-
-    if extension == ".txt":
-        with open(file_path, "r", encoding="utf-8") as file:
-            return file.read()
-
-    raise ValueError(
-        "Unsupported resume format. Please use PDF, DOCX, or TXT."
-    )
-
-
 def main():
+
     # --------------------------------------------------
     # INITIALIZE DJANGO
     # --------------------------------------------------
 
     setup_django()
 
-    # Import after Django is initialized
-    from core.flows.hr_pipeline.flow import HRPipelineFlow
+    # Import after Django setup.
+    from core.flows.hr_pipeline.flow import (
+        HRPipelineFlow,
+    )
+
+    from core.services.resume_parser import (
+        extract_resume_text,
+    )
 
     # --------------------------------------------------
-    # TEST INPUTS
+    # RAW DEMO INPUTS
     # --------------------------------------------------
 
-    resume_path = "media/resumes/Abedalaziz_Hamad_CV.pdf"
+    resume_path = (
+        "media/resumes/Abedalaziz_Hamad_CV.pdf"
+    )
 
     job_title = "Backend Engineer"
 
@@ -74,11 +49,10 @@ def main():
     We are looking for a Backend Engineer to build and maintain
     scalable backend applications and REST APIs.
 
-    The ideal candidate should have experience with Python,
-    Django, PostgreSQL, API development, and software engineering
-    best practices.
+    The engineer should have experience with Python, Django,
+    PostgreSQL, REST APIs, Git, and backend development.
 
-    The candidate should be able to collaborate with other
+    The candidate should collaborate effectively with other
     developers, debug technical issues, and write clean,
     maintainable code.
     """
@@ -98,45 +72,39 @@ def main():
     print("Reading resume...")
 
     if not os.path.exists(resume_path):
+
         raise FileNotFoundError(
-            f"Resume file was not found: {resume_path}"
+            f"Resume file was not found: "
+            f"{resume_path}"
         )
 
-    resume_text = extract_resume_text(resume_path)
+    resume_text = extract_resume_text(
+        resume_path
+    )
 
-    if not resume_text.strip():
+    if not resume_text:
+
         raise ValueError(
-            f"No text could be extracted from resume: {resume_path}"
+            "No text could be extracted from "
+            f"resume: {resume_path}"
         )
 
     print("Resume loaded successfully.")
 
     # --------------------------------------------------
-    # CREATE HR PIPELINE FLOW
+    # RUN RAW MODE
     # --------------------------------------------------
 
     print("Starting HR pipeline...")
 
     flow = HRPipelineFlow()
 
-    # --------------------------------------------------
-    # SET INITIAL FLOW STATE
-    # --------------------------------------------------
-
-    flow.state.candidate_resume = resume_text
-    flow.state.job_title = job_title
-    flow.state.job_description = job_description
-    flow.state.required_skills = required_skills
-
-    # --------------------------------------------------
-    # RUN PIPELINE
-    # --------------------------------------------------
-
-    result = flow.kickoff()
-
-    # --------------------------------------------------
-    # PRINT FINAL RESULT
-    # --------------------------------------------------
+    result = flow.kickoff(
+        candidate_resume=resume_text,
+        job_title=job_title,
+        job_description=job_description,
+        required_skills=required_skills,
+    )
 
     print("\nHR pipeline completed.\n")
 
