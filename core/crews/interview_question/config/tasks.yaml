@@ -1,0 +1,32 @@
+interview_question_task:
+  description: |
+    ### Inputs:
+    - **candidate_resume:** {candidate_resume}
+    - **job_title:** {job_title}
+    - **job_description:** {job_description}
+    - **screening_report:** {screening_report}
+
+    ### Task:
+    Design an interview guide for this candidate and role.
+    1. Read the candidate_resume, the job_description and the screening_report.
+    2. Generate 5 **technical** questions that verify the candidate's claimed
+       technical skills and probe the missing skills from the screening report.
+    3. Generate 4 **behavioral** questions that assess soft skills and culture
+       fit relevant to the role.
+    4. Generate 3 **follow-up** questions that dig deeper into specific
+       experiences or gaps mentioned in the resume or screening report.
+
+    Make every question specific to this candidate and role. Avoid generic,
+    copy-paste questions. Format your answer as JSON matching expected_output.
+
+  expected_output: >
+    Return ONLY a JSON object (do NOT wrap it in ```json fences, start directly
+    with {) using this exact structure:
+
+    {
+      "technical_questions": ["question", "..."],
+      "behavioral_questions": ["question", "..."],
+      "follow_up_questions": ["question", "..."]
+    }
+
+  agent: interview_question_generator

@@ -1,0 +1,66 @@
+resume_screening_task:
+  description: |
+    ### Inputs:
+    - candidate_resume: {candidate_resume}
+    - job_title: {job_title}
+    - job_description: {job_description}
+    - required_skills: {required_skills}
+
+    ### Task:
+    Review the candidate's resume and evaluate how well the candidate matches
+    the specified job.
+
+    Compare the resume against the job description and required skills.
+
+    Extract the technical skills and soft skills that are clearly demonstrated
+    in the resume.
+
+    Identify the candidate's strongest qualifications that are relevant to the
+    position.
+
+    Identify any required skills, experience, or qualifications that are not
+    demonstrated in the resume.
+
+    Assign a match score from 0 to 100 based on the candidate's demonstrated
+    alignment with the job requirements.
+
+    Provide one hiring recommendation using only one of these values:
+    "proceed", "hold", or "reject".
+
+    Provide a short summary explaining the main reasons for the score and
+    recommendation.
+
+    Base the entire evaluation only on information explicitly available in the
+    candidate's resume. Do not invent, assume, or infer qualifications,
+    experience, skills, or achievements that are not supported by the resume.
+
+  expected_output: >
+    Return only a valid JSON object using exactly this structure:
+
+    {
+      "match_score": 0,
+      "technical_skills": ["string"],
+      "soft_skills": ["string"],
+      "strengths": ["string"],
+      "missing_skills": ["string"],
+      "hiring_recommendation": "proceed",
+      "summary": "string"
+    }
+
+    Field definitions:
+    - match_score: integer from 0 to 100 representing the candidate's overall
+      match with the job.
+    - technical_skills: array of strings containing relevant technical skills
+      demonstrated in the resume.
+    - soft_skills: array of strings containing relevant soft skills demonstrated
+      in the resume.
+    - strengths: array of strings describing the candidate's strongest relevant
+      qualifications.
+    - missing_skills: array of strings containing required skills or
+      qualifications that are not demonstrated in the resume.
+    - hiring_recommendation: string with exactly one of these values:
+      "proceed", "hold", or "reject".
+    - summary: short string explaining the score and hiring recommendation.
+
+  agent: resume_screening_agent
+
