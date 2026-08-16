@@ -1,1 +1,3 @@
-from ..interview_question import InterviewQuestionCrew
+from .crew import InterviewQuestionCrew
+
+__all__ = ["InterviewQuestionCrew"]

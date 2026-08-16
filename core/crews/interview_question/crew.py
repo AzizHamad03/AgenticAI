@@ -20,7 +20,7 @@ class InterviewQuestionCrew:
     @task
     def interview_question_task(self) -> Task:
         return Task(
-            config=self.tasks_config["interview_questio_task"],
+            config=self.tasks_config["interview_question_task"],
         )
 
     @crew
