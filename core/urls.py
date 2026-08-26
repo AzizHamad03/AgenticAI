@@ -6,6 +6,7 @@ from core.views import (
     JobPositionCreateAPIView,
     ResumeUploadAPIView,
     ScreeningResultDetailAPIView,
+    TwilioWhatsAppWebhookView,
 )
 
 
@@ -35,4 +36,9 @@ urlpatterns = [
         InterviewQuestionSetDetailAPIView.as_view(),
         name="interview-question-set-detail",
     ),
+    path(
+    "whatsapp/webhook/",
+    TwilioWhatsAppWebhookView.as_view(),
+    name="whatsapp-webhook",
+),
 ]
