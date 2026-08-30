@@ -37,8 +37,8 @@ urlpatterns = [
         name="interview-question-set-detail",
     ),
     path(
-    "whatsapp/webhook/",
-    TwilioWhatsAppWebhookView.as_view(),
-    name="whatsapp-webhook",
-),
+        "whatsapp/webhook/",
+        TwilioWhatsAppWebhookView.as_view(),
+        name="whatsapp-webhook",
+    ),
 ]

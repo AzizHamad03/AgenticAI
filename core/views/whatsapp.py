@@ -2,7 +2,8 @@
 Twilio WhatsApp webhook.
 
 Twilio sends incoming WhatsApp messages to this endpoint.
-Fast commands reply immediately.
+
+Replies are sent using the Twilio REST API.
 
 The slower "run" command is processed in a background
 thread so the webhook can respond quickly.
@@ -17,32 +18,27 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
-from core.services.whatsapp import (
-    WhatsAppService,
-    split_message,
-)
+from core.services.whatsapp import WhatsAppService
 
 
 logger = logging.getLogger(__name__)
 
 
-def build_twiml_reply(
+def send_whatsapp_reply(
+    to_number: str,
     text: str,
-) -> HttpResponse:
+) -> None:
 
-    from twilio.twiml.messaging_response import (
-        MessagingResponse,
-    )
+    try:
+        WhatsAppService.send(
+            to_number,
+            text,
+        )
 
-    response = MessagingResponse()
-
-    for piece in split_message(text):
-        response.message(piece)
-
-    return HttpResponse(
-        str(response),
-        content_type="application/xml",
-    )
+    except Exception:
+        logger.exception(
+            "Failed to send WhatsApp reply"
+        )
 
 
 def run_pipeline_in_background(
@@ -53,7 +49,6 @@ def run_pipeline_in_background(
     close_old_connections()
 
     try:
-
         reply_text = WhatsAppService.handle(
             parsed
         )
@@ -64,18 +59,24 @@ def run_pipeline_in_background(
         )
 
     except Exception:
-
         logger.exception(
             "Background WhatsApp job failed"
         )
 
-        WhatsAppService.send(
-            to_number,
-            (
-                "⚠️ Sorry, the screening job "
-                "failed. Please try again."
-            ),
-        )
+        try:
+            WhatsAppService.send(
+                to_number,
+                (
+                    "⚠️ Sorry, the screening job "
+                    "failed. Please try again."
+                ),
+            )
+
+        except Exception:
+            logger.exception(
+                "Failed to send WhatsApp "
+                "background error message"
+            )
 
     finally:
         close_old_connections()
@@ -120,15 +121,26 @@ class TwilioWhatsAppWebhookView(View):
             message_text
         )
 
-        can_reply_later = (
-            WhatsAppService.can_send()
-            and from_number
-        )
+        if not from_number:
+            logger.warning(
+                "Twilio webhook received "
+                "a message without From."
+            )
 
-        if (
-            WhatsAppService.is_slow(parsed)
-            and can_reply_later
-        ):
+            return HttpResponse(
+                status=200
+            )
+
+        if not WhatsAppService.can_send():
+            logger.error(
+                "Twilio credentials are not configured."
+            )
+
+            return HttpResponse(
+                status=200
+            )
+
+        if WhatsAppService.is_slow(parsed):
 
             threading.Thread(
                 target=run_pipeline_in_background,
@@ -139,17 +151,29 @@ class TwilioWhatsAppWebhookView(View):
                 daemon=True,
             ).start()
 
-            return build_twiml_reply(
-                "⏳ Screening started. "
-                "I'll send the report and "
-                "interview questions here "
-                "in a moment."
+            send_whatsapp_reply(
+                from_number,
+                (
+                    "⏳ Screening started. "
+                    "I'll send the report and "
+                    "interview questions here "
+                    "in a moment."
+                ),
             )
 
-        reply_text = (
-            WhatsAppService.handle(parsed)
+            return HttpResponse(
+                status=200
+            )
+
+        reply_text = WhatsAppService.handle(
+            parsed
         )
 
-        return build_twiml_reply(
-            reply_text
+        send_whatsapp_reply(
+            from_number,
+            reply_text,
+        )
+
+        return HttpResponse(
+            status=200
         )

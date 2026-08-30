@@ -27,7 +27,8 @@ HELP_TEXT = (
     "AI-HRMS bot\n\n"
     "Send one of these:\n"
     "  run <candidate> ; <job> -> screen + interview questions\n"
-    "  get <candidate> ; <job> -> fetch latest stored results\n\n"
+    "  get <candidate> ; <job> -> fetch latest stored results\n"
+    "  menu -> show this help message\n\n"
     "Candidate and job can be an id or a name.\n"
     "Examples:\n"
     "  run Jane Doe ; Backend Engineer\n"
@@ -60,7 +61,10 @@ class WhatsAppService:
 
         text = (body or "").strip()
 
-        if not text or text.lower() == "help":
+        if not text or text.lower() in (
+            "help",
+            "menu",
+        ):
             return ParsedCommand(
                 action="help"
             )
@@ -132,7 +136,7 @@ class WhatsAppService:
             return (
                 "⚠️ "
                 + parsed.error
-                + "\n\nSend 'help' for usage."
+                + "\n\nSend 'menu' for usage."
             )
 
         try:

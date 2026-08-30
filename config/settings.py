@@ -153,15 +153,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 TWILIO_ACCOUNT_SID = config(
     "TWILIO_ACCOUNT_SID",
-    default=""
+    default="",
 )
 
 TWILIO_AUTH_TOKEN = config(
     "TWILIO_AUTH_TOKEN",
-    default=""
+    default="",
 )
 
 TWILIO_WHATSAPP_FROM = config(
     "TWILIO_WHATSAPP_FROM",
-    default=""
+    default="",
 )
